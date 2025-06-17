@@ -12,6 +12,7 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @State var catVM = CatViewModel()
 	@State var breeds: [CatBreed] = []
+	@State var total: Int = 0
 
     var body: some View {
 		NavigationStack{
@@ -31,6 +32,12 @@ struct ListView: View {
 		.task{@MainActor in
 			await catVM.getData()
 			breeds = catVM.breeds
+			total = catVM.total
+		}
+		.toolbar{
+			ToolbarItem(placement: .bottomBar) {
+				Text("\(breeds.count) of \(total) breeds")
+			}
 		}
     }
 }

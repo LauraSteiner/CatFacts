@@ -16,10 +16,12 @@ struct DetailView: View {
 			InfoRow(label: "Origin", value: breed.origin)
 			InfoRow(label: "Coat", value: breed.coat)
 			InfoRow(label: "Pattern", value: breed.pattern)
+			catImage
 		}
 		.listStyle(.plain)
 		.font(.title2)
 		.navigationTitle(breed.breed)
+		//.padding()
 	}
 }
 
@@ -48,6 +50,54 @@ struct InfoRow: View {
 				.bold()
 			Spacer()
 			Text(value)
+		}
+	}
+}
+
+extension DetailView{
+	var imageURL: String{
+		ImageURL.breedImages[breed.breed] ?? ""
+	}
+	var catImage: some View {
+		VStack{
+			if imageURL.isEmpty {
+				ImageNotAvailable()
+			}
+			else {
+				AsyncImage(url: URL(string: imageURL), content: { phase in
+					if let image = phase.image {
+						image
+							.resizable()
+							.scaledToFit()
+					} else if phase.error != nil {
+						ImageNotAvailable()
+					} else {
+						ProgressView()
+							.tint(.red)
+							.scaleEffect(4)
+							.frame(maxWidth: .infinity)
+							.frame(height: 250)
+					}
+				})
+			}
+		}
+	}
+}
+
+struct ImageNotAvailable: View {
+	var body: some View {
+		HStack{
+			Spacer()
+			VStack{
+				Image(systemName: "rectangle.slash")
+					.resizable()
+					.scaledToFit()
+					.foregroundStyle(.secondary)
+					.fontWeight(.thin)
+					.frame(height: 200)
+				Text("Image not available")
+			}
+			Spacer()
 		}
 	}
 }
