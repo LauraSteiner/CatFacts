@@ -22,4 +22,18 @@ class CatBreed: Identifiable, Codable {
 		case coat
 		case pattern
 	}
+	
+	init(
+		breed: String = "",
+		country: String = "",
+		origin: String = "",
+		coat: String = "",
+		pattern: String = ""
+	) {
+		self.breed = breed
+		self.country = country
+		self.origin = origin
+		self.coat = coat
+		self.pattern = pattern
+	}
 }

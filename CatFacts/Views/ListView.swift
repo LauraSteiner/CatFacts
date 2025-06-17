@@ -18,10 +18,15 @@ struct ListView: View {
 			VStack {
 				List {
 					ForEach(breeds) { breed in
-						Text(breed.breed)
+						NavigationLink(destination: DetailView(breed: breed)) {
+							Text(breed.breed)
+						}
 					}
 				}
+				.listStyle(.plain)
 			}
+			.font(.title2)
+			.navigationTitle("Cat Breeds")
 		}
 		.task{@MainActor in
 			await catVM.getData()
