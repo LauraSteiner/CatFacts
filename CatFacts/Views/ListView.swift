@@ -19,8 +19,15 @@ struct ListView: View {
 			VStack {
 				List {
 					ForEach(breeds) { breed in
-						NavigationLink(destination: DetailView(breed: breed)) {
-							Text(breed.breed)
+						LazyVStack{
+							NavigationLink(destination: DetailView(breed: breed)) {
+								Text(breed.breed)
+							}
+							.task{
+								print("In task to check if need to load more cats")
+								await catVM.loadNextIfNeeded(breed: breed)
+								breeds = catVM.breeds
+							}
 						}
 					}
 				}
@@ -45,3 +52,19 @@ struct ListView: View {
 #Preview {
     ListView()
 }
+
+/*
+ List (searchResults){ creature in
+ LazyVStack{
+ NavigationLink {
+ DetailView(creature: creature)
+ } label: {
+ Text("\(returnIndex(of: creature)). \(creature.name.capitalized)")
+ .font(.title2)
+ }
+ }
+ .task{
+ await creatures.loadNextIfNeeded(creature: creature)
+ }
+ }
+ */
