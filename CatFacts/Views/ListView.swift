@@ -11,14 +11,14 @@ import SwiftData
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @State var catVM = CatViewModel()
-	@State var breeds: [CatBreed] = []
+	//@State var breeds: [CatBreed] = []
 	@State var total: Int = 0
 
     var body: some View {
 		NavigationStack{
 			VStack {
 				List {
-					ForEach(breeds) { breed in
+					ForEach(catVM.breeds) { breed in
 						LazyVStack{
 							NavigationLink(destination: DetailView(breed: breed)) {
 								Text(breed.breed)
@@ -26,7 +26,7 @@ struct ListView: View {
 							.task{
 								print("In task to check if need to load more cats")
 								await catVM.loadNextIfNeeded(breed: breed)
-								breeds = catVM.breeds
+								//breeds = catVM.breeds
 							}
 						}
 					}
@@ -38,12 +38,12 @@ struct ListView: View {
 		}
 		.task{@MainActor in
 			await catVM.getData()
-			breeds = catVM.breeds
-			total = catVM.total
+			//breeds = catVM.breeds
+			//total = catVM.total
 		}
 		.toolbar{
 			ToolbarItem(placement: .bottomBar) {
-				Text("\(breeds.count) of \(total) breeds")
+				Text("\(catVM.breeds.count) of \(catVM.total) breeds")
 			}
 		}
     }
