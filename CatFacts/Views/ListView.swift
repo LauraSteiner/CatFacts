@@ -11,39 +11,49 @@ import SwiftData
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @State var catVM = CatViewModel()
-	//@State var breeds: [CatBreed] = []
 	@State var total: Int = 0
 
     var body: some View {
 		NavigationStack{
-			VStack {
-				List {
-					ForEach(catVM.breeds) { breed in
-						LazyVStack{
-							NavigationLink(destination: DetailView(breed: breed)) {
-								Text(breed.breed)
-							}
-							.task{
-								print("In task to check if need to load more cats")
-								await catVM.loadNextIfNeeded(breed: breed)
-								//breeds = catVM.breeds
+			ZStack {
+				VStack {
+					List {
+						ForEach(catVM.breeds) { breed in
+							LazyVStack{
+								NavigationLink(destination: DetailView(breed: breed)) {
+									Text(breed.breed)
+								}
+								.task{
+									await catVM.loadNextIfNeeded(breed: breed)
+								}
 							}
 						}
 					}
+					.listStyle(.plain)
 				}
-				.listStyle(.plain)
+				.font(.title2)
+				.navigationTitle("Cat Breeds")
+				if catVM.isLoading {
+					ProgressView()
+						.tint(.red)
+						.scaleEffect(4)
+				}
 			}
-			.font(.title2)
-			.navigationTitle("Cat Breeds")
 		}
 		.task{@MainActor in
 			await catVM.getData()
-			//breeds = catVM.breeds
-			//total = catVM.total
 		}
 		.toolbar{
-			ToolbarItem(placement: .bottomBar) {
+			ToolbarItem(placement: .status) {
 				Text("\(catVM.breeds.count) of \(catVM.total) breeds")
+			}
+			ToolbarItem(placement: .bottomBar) {
+				Button("Load all") {
+					Task{ @MainActor in
+						await catVM.loadAll()
+					}
+				}
+				.buttonStyle(.borderedProminent)
 			}
 		}
     }
@@ -52,19 +62,3 @@ struct ListView: View {
 #Preview {
     ListView()
 }
-
-/*
- List (searchResults){ creature in
- LazyVStack{
- NavigationLink {
- DetailView(creature: creature)
- } label: {
- Text("\(returnIndex(of: creature)). \(creature.name.capitalized)")
- .font(.title2)
- }
- }
- .task{
- await creatures.loadNextIfNeeded(creature: creature)
- }
- }
- */

@@ -14,12 +14,11 @@ class CatViewModel: Codable {
 	var currentPage: Int = 3 // for testing, set at 3
 	var breeds: [CatBreed] = []
 	var total: Int = 0
-	var nextPageUrl:  String = ""
 	
 	private struct Returned: Codable {
 		var data: [CatBreed]
-		var next_page_url: String?
 		var current_page: Int
+		var next_page_url: String?
 		var total: Int
 	}
 	
@@ -41,12 +40,10 @@ class CatViewModel: Codable {
 			}
 			Task { @MainActor in
 				self.breeds = self.breeds + returned.data
-				//self.nextPageUrl = returned.next_page_url ?? ""
 				self.urlString = returned.next_page_url ?? ""
 				self.currentPage = returned.current_page
 				self.total = returned.total
 				isLoading = false
-				print("Current page is \(self.currentPage)")
 			}
 			
 		} catch {
