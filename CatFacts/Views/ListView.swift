@@ -12,6 +12,7 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @State var catVM = CatViewModel()
 	@State var total: Int = 0
+	@State private var sheetIsShowing = false
 
     var body: some View {
 		NavigationStack{
@@ -39,23 +40,39 @@ struct ListView: View {
 						.scaleEffect(4)
 				}
 			}
+			.toolbar{
+				ToolbarItem(placement: .topBarTrailing) {
+					Button {
+						sheetIsShowing.toggle()
+					} label: {
+						HStack{
+							Text("🐈‍⬛")
+							Image(systemName: "lightbulb.fill")
+						}
+					}
+					.buttonStyle(.bordered)
+
+				}
+				ToolbarItem(placement: .status) {
+					Text("\(catVM.breeds.count) of \(catVM.total) breeds")
+				}
+				ToolbarItem(placement: .bottomBar) {
+					Button("Load all") {
+						Task{ @MainActor in
+							await catVM.loadAll()
+						}
+					}
+					.buttonStyle(.borderedProminent)
+				}
+			}
 		}
 		.task{@MainActor in
 			await catVM.getData()
 		}
-		.toolbar{
-			ToolbarItem(placement: .status) {
-				Text("\(catVM.breeds.count) of \(catVM.total) breeds")
-			}
-			ToolbarItem(placement: .bottomBar) {
-				Button("Load all") {
-					Task{ @MainActor in
-						await catVM.loadAll()
-					}
-				}
-				.buttonStyle(.borderedProminent)
-			}
+		.sheet(isPresented: $sheetIsShowing){
+			FactView()
 		}
+
     }
 }
 
